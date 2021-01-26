@@ -1,4 +1,7 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponse
+from django.contrib import messages
+from time import gmtime, strftime
+from datetime import datetime
 
 from .models import Shows
 
@@ -19,6 +22,22 @@ def new(request):
 
 # /shows/create - POST - method should add the show to the database, then redirect to /shows/<id>
 def create(request):
+    # VALIDATION
+    #pass post data to methods and save responses in a variable
+    # errors = Shows.objects.basic_validator(request.POST)
+    # #check for anything in the errors 
+    # if len(errors) > 0 :
+    # #if anything loop through key value pairs and make flash messages
+    #     for key, value in errors.items():
+    #         messages.error(request, value)
+    #     return redirect('/shows/new')
+    errors = Shows.objects.basic_validator(request.POST)
+    if errors:
+        for (key, value) in errors.items():
+            messages.error(request, value)
+        return redirect('/shows/new')
+
+
     if request.method == 'POST':
         Shows.objects.create(
 
@@ -27,7 +46,7 @@ def create(request):
             release_date=request.POST['release_date'],
             description=request.POST['description'],
         )
-    return redirect('/')
+    return redirect('/shows')
 
 
 # /shows/<id> - GET - method should return a template that displays the specific show's information
@@ -49,14 +68,21 @@ def edit(request, show_id):
 
 # /shows/<id>/update - POST - method should update the specific show in the database, then redirect to /shows/<id>
 def update(request, show_id):
+    #VALIDATION
+    errors = Shows.objects.basic_validator(request.POST)
+    if len(errors) > 0:
+        for key, value in errors.items():
+            messages.error(request, value)
+        return redirect('shows/<int:show_id>/edit')
+
     # some code here update specific show in db
     if request.method == 'POST':
         show = Shows.objects.get(id=show_id)
-        show.title = request.POST['title']
-        show.title = request.POST['title'],
-        show.network = request.POST['network'],
-        release_date = request.POST['release_date'],
-        show.description = request.POST['description'],
+        show.title = request.POST['new_title'],
+        show.network = request.POST['new_network'],
+        release_date = request.POST['new_release_date'],
+        show.description = request.POST['new_description'],
+        show.save()
     return redirect('/shows/<int:show_id>')
 
 

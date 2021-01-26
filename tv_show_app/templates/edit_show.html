@@ -10,23 +10,33 @@
 <body>
     <h1>Edit Show {{show.id}}</h1>
 
+    {% if messages%}
+    <ul>
+        {% for message in messages %}
+        <li {% if message.tags %} class="{{message.tag}}" {% endif %} >
+            {{message}}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
     <form action="/shows/{{show.id}}/update" method="post">
         {% csrf_token %}
         <label for="title">Title</label><br>
-        <input type="text" name="title" value="{{show.title}}">
+        <input type="text" name="new_title" value="{{show.title}}">
 
         <div>
             <label for="network">Network</label>
-            <input type="text" name="network" value="{{show.network}}">
+            <input type="text" name="new_network" value="{{show.network}}">
         </div>
 
         <div>
             <label for="release_date">Release date</label>
-            <input type="date" name="release_date" value="{{show.release_date}}" >
+            <input type="date" name="new_release_date" value="{{ show.release_date|date:'Y-m-d'}}">
         </div><br>
 
         <label for="description">Description</label>
-        <input type="text" name="description" value="{{show.description}}" >
+        <input type="text" name="new_description" value="{{show.description}}" >
 
         <input type="submit" value="Update">
 
